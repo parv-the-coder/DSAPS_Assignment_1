@@ -113,6 +113,65 @@ vector<string> autocomplete(trinode *root, string &pre)
     return ans;
 }
 
+// levenshtein edit distance
+int compute(string &str1, string &str2)
+{
+    int n = str1.size();
+    int m = str2.size();
+
+    // 2d dp for minimum distance between str1 and str2
+    vector<vector<int>> dp(n + 1, vector<int>(m + 1));
+
+    for (int i = 0; i < n; i++)
+    {
+        dp[i][0] = i; // i delete
+    }
+    for (int j = 0; j < m; j++)
+    {
+        dp[0][j] = j; // j insert
+    }
+
+    // completing dp table entry
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = 1; j <= m; j++)
+        {
+            if (str1[i - 1] == str2[j - 1])
+            {
+                dp[i][j] = dp[i - 1][j - 1];
+            }
+            else
+            {
+                int del = dp[i - 1][j];
+                int ins = dp[i][j - 1];
+                int change = dp[i - 1][j - 1];
+                int temp = min(del, ins);
+                dp[i][j] = 1 + min(temp, change);
+            }
+        }
+    }
+    return dp[n][m];
+}
+
+// autocorrect function
+vector<string> autocorrect(vector<string> &dict, string &query)
+{
+    vector<string> ans;
+
+    // for each word in dict
+    for (int i = 0; i < (int)dict.size(); i++)
+    {
+        int levdis = compute(query, dict[i]); // calculating levenshtein edit distance
+        if (levdis <= 3)
+        {
+            ans.push_back(dict[i]); // if<=3 store into ans
+        }
+    }
+
+    sort(ans.begin(), ans.end()); // for lexico order
+    return ans;
+}
+
 int main()
 {
     int n, q;
@@ -145,6 +204,17 @@ int main()
             cout << words.size() << endl; // total no. of words found
 
             for (string &str : words) // for eeach word in vector
+            {
+                cout << str << endl;
+            }
+        }
+
+        else if (flag == 3)
+        {
+            vector<string> ans = autocorrect(dict, query);
+
+            cout << ans.size() << endl; // count of matching words
+            for (string &str : ans)
             {
                 cout << str << endl;
             }
