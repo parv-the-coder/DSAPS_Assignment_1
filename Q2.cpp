@@ -47,6 +47,26 @@ trinode *setup(vector<string> &words)
 
 
 
+// sorting function for lexico order
+void sorting(vector<string> &ans)
+{
+    int size = ans.size();
+    for (int i = 0; i < size; i++)
+    {
+        for (int j = 0; j < size - i - 1; j++)
+        {
+            if (ans[j] > ans[j + 1])
+            {
+                string temp = ans[j];
+                ans[j] = ans[j + 1];
+                ans[j + 1] = temp;
+            }
+        }
+    }
+}
+
+
+
 // scan word through dict if it is present or not
 bool scan(trinode *root, string &word)
 {
@@ -65,6 +85,8 @@ bool scan(trinode *root, string &word)
     // after completing scan  returning if last node is end of valid word
     return node->end;
 }
+
+
 
 // depth first search to get all words from given node
 void dfs(trinode *node, string str, vector<string> &ans)
@@ -89,6 +111,8 @@ void dfs(trinode *node, string str, vector<string> &ans)
     }
 }
 
+
+
 // auto complete function
 vector<string> autocomplete(trinode *root, string &pre)
 {
@@ -108,10 +132,12 @@ vector<string> autocomplete(trinode *root, string &pre)
 
     vector<string> ans;
     dfs(node, pre, ans);          // to get all permutation
-    sort(ans.begin(), ans.end()); // sort in lexico order
+    sorting(ans);                 // sort in lexico order
 
     return ans;
 }
+
+
 
 // levenshtein edit distance
 int compute(string &str1, string &str2)
@@ -145,13 +171,25 @@ int compute(string &str1, string &str2)
                 int del = dp[i - 1][j];
                 int ins = dp[i][j - 1];
                 int change = dp[i - 1][j - 1];
-                int temp = min(del, ins);
-                dp[i][j] = 1 + min(temp, change);
+                int temp = del;
+
+                // finding minimum
+                if (temp > ins)
+                {
+                    temp = ins;
+                }
+                if (temp > change)
+                {
+                    temp = change;
+                }
+                dp[i][j] = 1 + temp;
             }
         }
     }
     return dp[n][m];
 }
+
+
 
 // autocorrect function
 vector<string> autocorrect(vector<string> &dict, string &query)
@@ -168,9 +206,11 @@ vector<string> autocorrect(vector<string> &dict, string &query)
         }
     }
 
-    sort(ans.begin(), ans.end()); // for lexico order
+    sorting(ans); // for lexico order
     return ans;
 }
+
+
 
 int main()
 {
@@ -218,6 +258,10 @@ int main()
             {
                 cout << str << endl;
             }
+        }
+        else
+        {
+            cout << "Invalid Input" << endl;
         }
     }
 }
