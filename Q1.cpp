@@ -298,6 +298,4 @@ int main()
     // save the image
     cv::imwrite(outputName, output);
     cout << "Resized image saved as " << outputName << endl;
-
-    return 0;
 }
