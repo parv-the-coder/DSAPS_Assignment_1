@@ -101,6 +101,7 @@ int *searchverti(double **energy, int height, int width)
 double **calenergy(int ***image, int height, int width)
 {
     double **energy = new double *[height];
+
     for (int i = 0; i < height; i++)
     {
         energy[i] = new double[width];
@@ -111,50 +112,63 @@ double **calenergy(int ***image, int height, int width)
     {
         for (int j = 0; j < width; j++)
         {
-            // adjacent pixels for  calculation of gradient
-            int left, right, up, down;
+            // setting limits
 
+            int left, right, up, down;
+            // left
             if (j == 0)
             {
                 left = 0;
             }
             else
             {
-                left = image[i][j - 1][0];
+                left = j - 1;
             }
 
+            // right
             if (j == width - 1)
             {
-                right = 0;
+                right = width - 1;
             }
             else
             {
-                right = image[i][j + 1][0];
+                right = j + 1;
             }
 
+            // up
             if (i == 0)
             {
                 up = 0;
             }
             else
             {
-                up = image[i - 1][j][0];
+                up = i - 1;
             }
 
+            // down
             if (i == height - 1)
             {
-                down = 0;
+                down = height - 1;
             }
             else
             {
-                down = image[i + 1][j][0];
+                down = i + 1;
             }
 
-            // calculating gradient
-            int dx = right - left; // x-axis gradient
-            int dy = down - up;    // y-axis gradient
+            // rgb diff in x
+            int dxr = image[i][right][2] - image[i][left][1];
+            int dxg = image[i][right][2] - image[i][left][2];
+            int dxb = image[i][right] - image[i][left];
 
-            energy[i][j] = sqrt(dx * dx + dy * dy);
+            // rgb diff in y
+            int dyr = image[down][j][1] - image[up][j][1];
+            int dyg = image[down][j][2] - image[up][j][2];
+            int dyb = image[down][j] - image[up][j];
+
+            double sqx2 = dxr * dxr + dxg * dxg + dxb * dxb;
+            double sqy2 = dyr * dyr + dyg * dyg + dyb * dyb;
+
+            energy[i][j] = sqrt(sqx2 + sqy2);
         }
     }
     return energy;
