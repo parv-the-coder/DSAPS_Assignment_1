@@ -122,8 +122,8 @@ void pass(int node, int start, int end)
             {
                 pending[2*node+1] = pending[node];
             }
-            }
-             
+        }
+
         pending[node] = 0;      //no pending updates left
     }
 }
@@ -136,13 +136,13 @@ void updating(int node, int start, int end, int left, int right, int height)
     
     pass(node, start, end);
 
-    // distinct
+    // not overlapping
     if (end < left || start > right)
     {
         return;
-    } 
+    }
 
-    // complete over
+    // complete over lapping
     if (left <= start && end <= right) 
     {
         if (height > pending[node])
@@ -182,6 +182,7 @@ int query(int node, int start, int end, int pos)
     }
 
     int mid = start + (end-start) / 2;
+
     if (pos <= mid) 
     {
         return query(2*node, start, mid, pos);
@@ -197,19 +198,28 @@ int query(int node, int start, int end, int pos)
 //printing silhouette
 void printing()
  {
-    int prev = 0;       // keeping track
-    for (int i = 0; i < ndifcord-1; i++) 
-    {
-        int height = query(1, 0, ndifcord-2, i); // get height for i
-        if (height != prev) 
-        {
-            cout << diff[i] << " " << height << "\n";
-            prev = height;
-        }
-    }
+     int prev = 0;  // keeping track of height printed
+     int last = -1; // stores last index height changed
 
-    // last cords at 0
-    cout << diff[ndifcord-1] << " 0\n";
+     // looping over all compressed cords
+     for (int i = 0; i < ndifcord - 1; i++)
+     {
+
+         int height = query(1, 0, ndifcord - 2, i); // get height for i
+
+         if (height != prev)
+         {
+             cout << diff[i] << " " << height << "\n"; // printing cords and height
+             prev = height;                            // updating last height
+             last = i;                                 // updating last changed i
+         }
+     }
+
+     // printing end cords with 0 if last height not 0
+     if (prev != 0)
+     {
+         cout << diff[ndifcord - 1] << " 0\n";
+     }
 }
 
 
@@ -223,7 +233,7 @@ int main()
     int q;
     cin >> q;   // total no. of queries
 
-    // for storing queries
+    // for storing queries taking worst case
     int type[maxiquery],l[maxiquery], r[maxiquery], h[maxiquery];
 
     for (int i = 0; i < q; i++) 
@@ -242,7 +252,7 @@ int main()
 
     }
 
-    // compressing cords by remv duplicate and store in diff
+    // compressing cords by removing duplicate and store in diff
     qsort(cords, 0, total-1);
     ndifcord = compdiff(cords, total, diff);
 
